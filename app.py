@@ -47,8 +47,8 @@ div[class*="st-key-flip_"] button:disabled {opacity:.86;filter:saturate(.85);}
 div[data-testid="stRadio"] label {color:#fff0d0!important;}
 div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,103,.35);}
 /* Compact desktop layout to minimise scrolling on standard laptop screens. */
-.block-container {max-width:1320px;padding:.35rem 1.2rem .4rem !important;background:transparent !important;}
-[data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] {gap:.35rem !important;}
+.block-container {max-width:1600px;padding:.45rem 1.4rem .7rem !important;background:transparent !important;}
+[data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] {gap:.48rem !important;}
 [data-testid="stMarkdownContainer"] p {margin-bottom:.2rem;}
 [data-testid="stMarkdownContainer"] h2 {font-size:1.15rem;margin:.15rem 0;}
 [data-testid="stMarkdownContainer"] h3 {font-size:1.05rem;margin:.15rem 0;}
@@ -57,18 +57,20 @@ div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,10
 .hero h1 {font-size:clamp(2rem,4vw,3.2rem) !important;margin:.05rem 0 !important;}
 .eyebrow {font-size:.58rem !important;letter-spacing:.2em !important;}
 .subtitle {font-size:.78rem !important;}
-.panel {padding:.5rem .7rem !important;margin-bottom:.3rem !important;border-radius:12px !important;}
+.panel {padding:.55rem .8rem !important;margin-bottom:.25rem !important;border-radius:12px !important;}
 .player-name {font-size:.95rem !important;}
 .big-stat {font-size:1.2rem !important;}
 .stat {font-size:.62rem !important;}
 .event {padding:.45rem .7rem !important;margin:.1rem 0 !important;}
-div.stButton > button {min-height:2.1rem !important;padding:.2rem .45rem !important;}
-div[class*="st-key-flip_"] button {height:104px !important;min-height:104px !important;font-size:1rem !important;}
+div.stButton > button {min-height:2.45rem !important;padding:.35rem .65rem !important;background:linear-gradient(180deg,#6e2447,#42172f) !important;color:#fff1d1 !important;border:2px solid #bd9650 !important;box-shadow:0 3px 0 #241020 !important;}
+div.stButton > button[kind="primary"] {background:linear-gradient(180deg,#ffe6a0,#d5a843) !important;color:#35152e !important;border:2px solid #fff0b4 !important;box-shadow:0 3px 0 #875c28 !important;}
+div.stButton > button:disabled {opacity:.55 !important;color:#cbbca9 !important;}
+div[class*="st-key-flip_"] button {height:116px !important;min-height:116px !important;font-size:1rem !important;}
 @media (max-height:700px) {
  .hero {padding:.25rem .6rem !important;}
  .hero h1 {font-size:2rem !important;}
  .panel {padding:.35rem .55rem !important;}
- div[class*="st-key-flip_"] button {height:82px !important;min-height:82px !important;}
+ div[class*="st-key-flip_"] button {height:96px !important;min-height:96px !important;}
  .card-pip {font-size:2rem !important;}
 }
 </style>
@@ -266,7 +268,7 @@ for i, col in enumerate(cols):
 
 # ---------- Card rows: host clicks to reveal ----------
 st.markdown("### THE PLAYING TABLE")
-st.markdown("**HOST: YOU ARE THE SHOW'S CARD MASTER!** Ask the player for Higher or Lower, record their call, then click the big face-down card to reveal it.")
+st.caption("HOST CONTROL: record the call, then select the active player’s next card to reveal it.")
 for i, p in enumerate(players):
     st.markdown(f"**{p['name']}'s row**")
     card_cols = st.columns(5, gap="small")
@@ -281,7 +283,7 @@ for i, p in enumerate(players):
                 suit = card["suit"]
                 face = f"{label}{suit}"
                 extra = "card-gold" if rank == 1 else ("card-red" if suit in RED_SUITS else "")
-                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:150px"><div class="card-corner">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div><span class="card-index">CARD {j+1}</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:116px"><div class="card-corner">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div><span class="card-index">CARD {j+1}</span></div>', unsafe_allow_html=True)
             else:
                 is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
                 can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
@@ -390,13 +392,13 @@ else:
                 st.rerun()
         c1, c2 = st.columns(2)
         with c1:
-            if st.button("⬆️  HIGHER!", type="primary" if g.get("host_guess") == "Higher" else "secondary", use_container_width=True):
+            if st.button("⬆️  HIGHER", type="primary", use_container_width=True):
                 g["host_guess"] = "Higher"
                 g["host_use_free_flip"] = False
                 g["last_message"] = "Higher selected. Host: click the active player's next face-down card to reveal it."
                 st.rerun()
         with c2:
-            if st.button("⬇️  LOWER!", type="primary" if g.get("host_guess") == "Lower" else "secondary", use_container_width=True):
+            if st.button("⬇️  LOWER", type="primary", use_container_width=True):
                 g["host_guess"] = "Lower"
                 g["host_use_free_flip"] = False
                 g["last_message"] = "Lower selected. Host: click the active player's next face-down card to reveal it."
