@@ -30,7 +30,7 @@ p,div,span,label {font-family:'DM Sans',sans-serif;}
 .card-front:before {content:"";position:absolute;inset:5px;border:1px solid rgba(150,117,65,.35);border-radius:5px;pointer-events:none;}
 .card-corner {font-size:1.3rem;font-weight:900;line-height:.9;z-index:1;text-align:center;}
 .card-corner small {display:block;font-size:.85rem;margin-top:3px;}
-.card-pip {position:absolute;inset:0;display:grid;place-items:center;font-size:3.1rem;line-height:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
+.card-pip {position:absolute;inset:0;display:grid;place-items:center;font-size:2.4rem;line-height:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
 .card-bottom {position:absolute;right:9px;bottom:8px;transform:rotate(180deg);}
 .card-red {color:#c3223e;}
 .card-gold {background:linear-gradient(145deg,#fff5ce,#e8bd62);border-color:#fff0b1;}
@@ -42,10 +42,36 @@ p,div,span,label {font-family:'DM Sans',sans-serif;}
 div.stButton > button {border-radius:12px;font-weight:900;min-height:2.8rem;border:2px solid #d8b86b;letter-spacing:.025em;transition:transform .12s ease,filter .12s ease;}
 div.stButton > button:hover {transform:translateY(-2px);filter:brightness(1.12);border-color:#fff0b4;}
 div.stButton > button[kind="primary"] {background:linear-gradient(180deg,#ffe6a0,#d5a843);color:#35152e;border:2px solid #fff0b4;box-shadow:0 4px 0 #875c28;}
-div[class*="st-key-flip_"] button {height:150px;min-height:150px;width:100%;border-radius:10px;background-color:#78172e !important;background-image:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,211,117,.24) 8px 10px),repeating-linear-gradient(-45deg,transparent 0 8px,rgba(255,211,117,.2) 8px 10px),radial-gradient(ellipse at center,#a72c42 0%,#681329 75%) !important;color:#ffe3a0!important;border:4px solid #f4d58a!important;box-shadow:inset 0 0 0 4px #501020,inset 0 0 0 6px #e6bd67,0 8px 18px rgba(0,0,0,.45)!important;font-family:Georgia,serif;font-size:1.25rem;font-weight:900;white-space:pre-wrap;}
+div[class*="st-key-flip_"] button {height:104px;min-height:150px;width:100%;border-radius:10px;background-color:#78172e !important;background-image:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,211,117,.24) 8px 10px),repeating-linear-gradient(-45deg,transparent 0 8px,rgba(255,211,117,.2) 8px 10px),radial-gradient(ellipse at center,#a72c42 0%,#681329 75%) !important;color:#ffe3a0!important;border:4px solid #f4d58a!important;box-shadow:inset 0 0 0 4px #501020,inset 0 0 0 6px #e6bd67,0 8px 18px rgba(0,0,0,.45)!important;font-family:Georgia,serif;font-size:1.25rem;font-weight:900;white-space:pre-wrap;}
 div[class*="st-key-flip_"] button:disabled {opacity:.86;filter:saturate(.85);}
 div[data-testid="stRadio"] label {color:#fff0d0!important;}
-div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,103,.35);}</style>
+div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,103,.35);}
+/* Compact desktop layout to minimise scrolling on standard laptop screens. */
+.block-container {max-width:1320px;padding:.35rem 1.2rem .4rem !important;background:transparent !important;}
+[data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] {gap:.35rem !important;}
+[data-testid="stMarkdownContainer"] p {margin-bottom:.2rem;}
+[data-testid="stMarkdownContainer"] h2 {font-size:1.15rem;margin:.15rem 0;}
+[data-testid="stMarkdownContainer"] h3 {font-size:1.05rem;margin:.15rem 0;}
+[data-testid="stHorizontalBlock"] {gap:.5rem !important;}
+.hero {padding:.45rem .8rem .55rem !important;margin-bottom:.35rem !important;border-width:2px !important;}
+.hero h1 {font-size:clamp(2rem,4vw,3.2rem) !important;margin:.05rem 0 !important;}
+.eyebrow {font-size:.58rem !important;letter-spacing:.2em !important;}
+.subtitle {font-size:.78rem !important;}
+.panel {padding:.5rem .7rem !important;margin-bottom:.3rem !important;border-radius:12px !important;}
+.player-name {font-size:.95rem !important;}
+.big-stat {font-size:1.2rem !important;}
+.stat {font-size:.62rem !important;}
+.event {padding:.45rem .7rem !important;margin:.1rem 0 !important;}
+div.stButton > button {min-height:2.1rem !important;padding:.2rem .45rem !important;}
+div[class*="st-key-flip_"] button {height:104px !important;min-height:104px !important;font-size:1rem !important;}
+@media (max-height:700px) {
+ .hero {padding:.25rem .6rem !important;}
+ .hero h1 {font-size:2rem !important;}
+ .panel {padding:.35rem .55rem !important;}
+ div[class*="st-key-flip_"] button {height:82px !important;min-height:82px !important;}
+ .card-pip {font-size:2rem !important;}
+}
+</style>
 """, unsafe_allow_html=True)
 
 SUITS = ["♠", "♥", "♦", "♣"]
@@ -239,7 +265,7 @@ for i, col in enumerate(cols):
         st.markdown(f'<div class="panel {cls}"><div class="player-name">{p["name"]}</div>{active_label}<div style="display:flex;justify-content:space-between;margin-top:14px"><div><div class="stat">Cards cleared</div><div class="big-stat">{p["progress"]}/5</div></div><div><div class="stat">Aces</div><div class="big-stat">🂡 {p["aces"]}</div></div><div><div class="stat">Free flips</div><div class="big-stat">✨ {p["free_flips"]}</div></div></div></div>', unsafe_allow_html=True)
 
 # ---------- Card rows: host clicks to reveal ----------
-st.markdown("## THE PLAYING TABLE")
+st.markdown("### THE PLAYING TABLE")
 st.markdown("**HOST: YOU ARE THE SHOW'S CARD MASTER!** Ask the player for Higher or Lower, record their call, then click the big face-down card to reveal it.")
 for i, p in enumerate(players):
     st.markdown(f"**{p['name']}'s row**")
