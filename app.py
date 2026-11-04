@@ -7,38 +7,33 @@ st.set_page_config(page_title="Higher or Lower | Trivia Challenge", page_icon="�
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
-.stApp {background: radial-gradient(ellipse at 50% -20%, #203451 0%, #101a2b 45%, #09111e 100%); color:#f4f6fb;}
-.block-container {max-width:1180px; padding-top:2rem; padding-bottom:3rem;}
-h1,h2,h3 {font-family:'Playfair Display',serif !important; color:#fff;}
+.stApp {background:radial-gradient(ellipse at 50% 0%,#4b1730 0%,#24132c 38%,#101426 78%,#090d19 100%);color:#fff5df;}
+.block-container {max-width:1240px;padding-top:1.4rem;padding-bottom:3rem;}
+h1,h2,h3 {font-family:'Playfair Display',serif !important;color:#fff3d1;}
 p,div,span,label {font-family:'DM Sans',sans-serif;}
-.hero {text-align:center; padding:1.2rem 0 1.5rem;}
-.eyebrow {color:#d7b76b; letter-spacing:.25em; font-size:.72rem; font-weight:800; text-transform:uppercase;}
-.hero h1 {font-size:clamp(2.4rem,6vw,4.5rem); line-height:1.05; margin:.25rem 0;}
-.subtitle {color:#aebbd0; font-size:1rem;}
-.panel {background:linear-gradient(145deg,rgba(30,47,70,.95),rgba(17,29,47,.96)); border:1px solid rgba(181,199,225,.16); border-radius:18px; padding:1.1rem 1.2rem; box-shadow:0 14px 36px rgba(0,0,0,.18); margin-bottom:1rem;}
-.player-a {border-top:3px solid #58a6ff;}
-.player-b {border-top:3px solid #ff777e;}
-.player-name {font-size:1.05rem; font-weight:800; color:#fff;}
-.stat {color:#aebbd0; font-size:.78rem; text-transform:uppercase; letter-spacing:.1em;}
-.big-stat {font-size:1.65rem; font-weight:800; color:#f2d58b;}
-.playing {color:#f2d58b; font-weight:800; font-size:.78rem; letter-spacing:.12em; text-transform:uppercase;}
-.cards {display:flex; flex-wrap:wrap; gap:9px; justify-content:center; padding:.8rem 0;}
-.playing-card {width:clamp(48px,8vw,82px); height:112px; border-radius:11px; display:flex; flex-direction:column; justify-content:space-between; padding:9px; box-sizing:border-box; box-shadow:0 7px 14px rgba(0,0,0,.25); font-weight:800;}
-.card-back {background:repeating-linear-gradient(45deg,#17395c,#17395c 7px,#214d78 7px,#214d78 14px); border:2px solid #b6c7d8; color:#e7eef7; align-items:center; justify-content:center; font-size:1.7rem;}
-.card-front {background:linear-gradient(145deg,#fff,#e8edf3); color:#182335; border:2px solid #fff;}
-.card-red {color:#c83d52;}
-.card-gold {background:linear-gradient(145deg,#fff4ce,#e4c16a); border:2px solid #f7df9c;}
-.card-value {font-size:1.55rem; line-height:1;}
-.card-suit {font-size:1.1rem; align-self:flex-end;}
-.card-index {font-size:.62rem; color:#9ca9b8;}
-.event {background:rgba(217,178,91,.1); border:1px solid rgba(217,178,91,.32); border-radius:13px; padding:1rem; color:#f4e4bb;}
-.muted {color:#aebbd0;}
-div.stButton > button {border-radius:11px; font-weight:800; min-height:2.8rem; border:1px solid rgba(255,255,255,.16);}
-div.stButton > button[kind="primary"] {background:linear-gradient(135deg,#d8b66b,#a9823d); color:#172235; border:0;}
-div[data-testid="stRadio"] label {color:#e8edf5 !important;}
-div[data-testid="stAlert"] {border-radius:12px;}
-hr {border-color:rgba(255,255,255,.12);}
-</style>
+.hero {text-align:center;padding:1.1rem 1rem 1.5rem;border:3px solid #d9b65e;border-radius:22px;background:linear-gradient(110deg,rgba(100,18,47,.94),rgba(29,24,58,.96),rgba(100,18,47,.94));box-shadow:0 0 0 5px rgba(217,182,94,.12),0 0 35px rgba(241,187,77,.22);margin-bottom:1.2rem;}
+.eyebrow {color:#ffe29a;letter-spacing:.3em;font-size:.72rem;font-weight:800;text-transform:uppercase;}
+.hero h1 {font-size:clamp(2.5rem,6vw,5rem);line-height:1.02;margin:.25rem 0;text-transform:uppercase;text-shadow:0 4px 0 #702342,0 7px 18px #000;}
+.subtitle {color:#ffe9bd;font-size:1rem;letter-spacing:.04em;}
+.panel {background:linear-gradient(145deg,rgba(74,24,54,.97),rgba(24,29,58,.98));border:2px solid rgba(231,192,103,.65);border-radius:16px;padding:1.1rem 1.2rem;box-shadow:0 10px 28px rgba(0,0,0,.3),inset 0 0 22px rgba(255,255,255,.025);margin-bottom:1rem;}
+.player-a {border-top:5px solid #4bb9ef;}.player-b {border-top:5px solid #f16d75;}
+.player-name {font-size:1.1rem;font-weight:800;color:#fff;}
+.stat {color:#f1d8a4;font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;}
+.big-stat {font-size:1.65rem;font-weight:800;color:#ffdc82;text-shadow:0 2px 8px #000;}
+.playing {color:#ffe08b;font-weight:800;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;}
+.card-back {background:repeating-linear-gradient(135deg,#6c1738 0px,#6c1738 8px,#a52e4e 8px,#a52e4e 16px);border:3px solid #f4d58a;color:#fff4d8;box-shadow:inset 0 0 0 4px rgba(255,225,155,.18),0 8px 18px rgba(0,0,0,.35);}
+.card-front {background:linear-gradient(145deg,#fffef8,#e9dfcc);color:#211a29;border:3px solid #f5d98d;box-shadow:0 8px 18px rgba(0,0,0,.35);}
+.card-red {color:#bd2446;}.card-gold {background:linear-gradient(145deg,#fff3c5,#e4b84f);border:3px solid #fff0ad;}
+.card-value {font-size:1.7rem;line-height:1;}.card-suit {font-size:1.1rem;align-self:flex-end;}.card-index {font-size:.62rem;color:#9ca9b8;}
+.event {background:linear-gradient(100deg,rgba(116,27,54,.92),rgba(52,31,65,.95));border:2px solid #d9b65e;border-radius:13px;padding:1rem;color:#fff0c7;box-shadow:0 7px 20px rgba(0,0,0,.2);}
+.muted {color:#d8c5bd;}
+div.stButton > button {border-radius:12px;font-weight:900;min-height:2.8rem;border:2px solid #d8b86b;letter-spacing:.025em;transition:transform .12s ease,filter .12s ease;}
+div.stButton > button:hover {transform:translateY(-2px);filter:brightness(1.12);border-color:#fff0b4;}
+div.stButton > button[kind="primary"] {background:linear-gradient(180deg,#ffe6a0,#d5a843);color:#35152e;border:2px solid #fff0b4;box-shadow:0 4px 0 #875c28;}
+div[class*="st-key-flip_"] button {height:118px;min-height:118px;width:100%;border-radius:13px;background:repeating-linear-gradient(135deg,#6c1738 0px,#6c1738 8px,#a52e4e 8px,#a52e4e 16px)!important;color:#fff3d3!important;border:3px solid #f4d58a!important;box-shadow:inset 0 0 0 4px rgba(255,225,155,.18),0 8px 18px rgba(0,0,0,.38)!important;font-size:1.1rem;font-weight:900;white-space:pre-wrap;}
+div[class*="st-key-flip_"] button:disabled {opacity:.86;filter:saturate(.85);}
+div[data-testid="stRadio"] label {color:#fff0d0!important;}
+div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,103,.35);}</style>
 """, unsafe_allow_html=True)
 
 SUITS = ["♠", "♥", "♦", "♣"]
@@ -209,7 +204,7 @@ if "game" not in st.session_state:
     st.session_state.setup = True
     st.session_state.game = None
 
-st.markdown('<div class="hero"><div class="eyebrow">Two-player card & general knowledge game</div><h1>Higher or Lower</h1><div class="subtitle">The Trivia Challenge · Read the cards. Trust your instincts. Beat the traps.</div></div>', unsafe_allow_html=True)
+st.markdown('<div class="hero"><div class="eyebrow">Ladies and gentlemen · Your Saturday night game show</div><h1>Higher or Lower!</h1><div class="subtitle">THE TRIVIA CHALLENGE · BIG CARDS · BIG CALLS · BIG DRAMA</div></div>', unsafe_allow_html=True)
 
 if st.session_state.get("setup", True):
     st.markdown('<div class="panel"><h3 style="text-align:center">Set up the table</h3><p class="muted" style="text-align:center">Two players. Five cards each. First to turn over all five wins.</p></div>', unsafe_allow_html=True)
@@ -244,7 +239,7 @@ for i, col in enumerate(cols):
         st.markdown(f'<div class="panel {cls}"><div class="player-name">{p["name"]}</div>{active_label}<div style="display:flex;justify-content:space-between;margin-top:14px"><div><div class="stat">Cards cleared</div><div class="big-stat">{p["progress"]}/5</div></div><div><div class="stat">Aces</div><div class="big-stat">🂡 {p["aces"]}</div></div><div><div class="stat">Free flips</div><div class="big-stat">✨ {p["free_flips"]}</div></div></div></div>', unsafe_allow_html=True)
 
 # ---------- Card rows: host clicks to reveal ----------
-st.markdown("### The table")
+st.markdown("## THE PLAYING TABLE")
 st.caption("The host controls the laptop. Ask the active player for their call, then click the next face-down card to reveal it.")
 for i, p in enumerate(players):
     st.markdown(f"**{p['name']}'s row**")
@@ -264,7 +259,7 @@ for i, p in enumerate(players):
             else:
                 is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
                 can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
-                if st.button(f"🂠 CARD {j+1}", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
+                if st.button(f"✦ CARD {j+1} ✦", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
                     use_free = bool(g.get("host_use_free_flip"))
                     chosen_guess = g.get("host_guess")
                     if use_free and p["free_flips"] > 0:
@@ -364,13 +359,13 @@ else:
                 st.rerun()
         c1, c2 = st.columns(2)
         with c1:
-            if st.button("⬆️  PLAYER CALLS HIGHER", type="primary" if g.get("host_guess") == "Higher" else "secondary", use_container_width=True):
+            if st.button("⬆️  HIGHER!", type="primary" if g.get("host_guess") == "Higher" else "secondary", use_container_width=True):
                 g["host_guess"] = "Higher"
                 g["host_use_free_flip"] = False
                 g["last_message"] = "Higher selected. Host: click the active player's next face-down card to reveal it."
                 st.rerun()
         with c2:
-            if st.button("⬇️  PLAYER CALLS LOWER", type="primary" if g.get("host_guess") == "Lower" else "secondary", use_container_width=True):
+            if st.button("⬇️  LOWER!", type="primary" if g.get("host_guess") == "Lower" else "secondary", use_container_width=True):
                 g["host_guess"] = "Lower"
                 g["host_use_free_flip"] = False
                 g["last_message"] = "Lower selected. Host: click the active player's next face-down card to reveal it."
