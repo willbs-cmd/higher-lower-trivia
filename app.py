@@ -240,7 +240,7 @@ for i, col in enumerate(cols):
 
 # ---------- Card rows: host clicks to reveal ----------
 st.markdown("## THE PLAYING TABLE")
-st.caption("The host controls the laptop. Ask the active player for their call, then click the next face-down card to reveal it.")
+st.markdown("**HOST: YOU ARE THE SHOW'S CARD MASTER!** Ask the player for Higher or Lower, record their call, then click the big face-down card to reveal it.")
 for i, p in enumerate(players):
     st.markdown(f"**{p['name']}'s row**")
     card_cols = st.columns(5, gap="small")
