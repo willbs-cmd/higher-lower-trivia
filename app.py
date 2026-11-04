@@ -25,24 +25,24 @@ p,div,span,label {font-family:'DM Sans',sans-serif;}
 .stat {color:#f1d8a4;font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;}
 .big-stat {font-size:1.65rem;font-weight:800;color:#ffdc82;text-shadow:0 2px 8px #000;}
 .playing {color:#ffe08b;font-weight:800;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;}
-.playing-card {position:relative;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:9px 10px;border-radius:10px;overflow:hidden;font-family:Georgia,serif;}
-.card-front {background:linear-gradient(135deg,#fffef9 0%,#f5eedf 58%,#e5dac5 100%);color:#171522;border:3px solid #e9c979;box-shadow:inset 0 0 0 2px #fff,0 8px 18px rgba(0,0,0,.42);}
-.card-front:before {content:"";position:absolute;inset:5px;border:1px solid rgba(150,117,65,.35);border-radius:5px;pointer-events:none;}
-.card-corner {font-size:1.3rem;font-weight:900;line-height:.9;z-index:1;text-align:center;}
-.card-corner small {display:block;font-size:.85rem;margin-top:3px;}
-.card-pip {position:absolute;inset:0;display:grid;place-items:center;font-size:2.4rem;line-height:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
-.card-bottom {position:absolute;right:9px;bottom:8px;transform:rotate(180deg);}
-.card-red {color:#c3223e;}
-.card-gold {background:linear-gradient(145deg,#fff5ce,#e8bd62);border-color:#fff0b1;}
-.card-index {position:absolute;bottom:5px;left:0;right:0;text-align:center;font:600 .48rem 'DM Sans',sans-serif;letter-spacing:.12em;color:#9c8a6c;opacity:.85;}
-.card-back-face {background-color:#78172e !important;background-image:repeating-linear-gradient(45deg,transparent 0 7px,rgba(255,211,117,.24) 7px 9px),repeating-linear-gradient(-45deg,transparent 0 7px,rgba(255,211,117,.2) 7px 9px),radial-gradient(ellipse at center,#a72c42 0%,#681329 75%) !important;border:3px solid #f4d58a !important;box-shadow:inset 0 0 0 4px #501020,inset 0 0 0 6px #e6bd67,0 8px 18px rgba(0,0,0,.42) !important;}
-.card-back-face div {border:1px solid rgba(255,218,135,.75);height:100%;width:100%;border-radius:5px;display:grid;place-items:center;font-size:2rem;color:#f7d67e;text-shadow:0 2px 4px #300914;}
+.playing-card {position:relative;box-sizing:border-box;display:block;padding:0;border-radius:11px;overflow:hidden;font-family:Georgia,serif;isolation:isolate;}
+.card-front {background:linear-gradient(145deg,#fffefa 0%,#f7f0e2 68%,#e9dfcc 100%);color:#171522;border:3px solid #d9b967;box-shadow:inset 0 0 0 2px #fff,inset 0 0 18px rgba(91,62,27,.08),0 5px 12px rgba(0,0,0,.3);}
+.card-front:before {content:"";position:absolute;inset:5px;border:1px solid rgba(150,117,65,.4);border-radius:6px;pointer-events:none;z-index:0;}
+.card-corner {position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:1.18rem;font-weight:900;line-height:.9;min-width:22px;}
+.card-corner small {font-size:.9rem;line-height:1;}
+.card-top {top:10px;left:12px;}
+.card-bottom {right:12px;bottom:10px;transform:rotate(180deg);}
+.card-pip {position:absolute;inset:0;display:grid;place-items:center;font-size:3.25rem;line-height:1;z-index:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
+.card-red {color:#bd263f;}
+.card-gold {background:linear-gradient(145deg,#fff7d8,#f0d38a 72%,#dfbb68);border-color:#f2d991;}
 .event {background:linear-gradient(100deg,rgba(116,27,54,.92),rgba(52,31,65,.95));border:2px solid #d9b65e;border-radius:13px;padding:1rem;color:#fff0c7;box-shadow:0 7px 20px rgba(0,0,0,.2);}
 .muted {color:#d8c5bd;}
 div.stButton > button {border-radius:12px;font-weight:900;min-height:2.8rem;border:2px solid #d8b86b;letter-spacing:.025em;transition:transform .12s ease,filter .12s ease;}
 div.stButton > button:hover {transform:translateY(-2px);filter:brightness(1.12);border-color:#fff0b4;}
 div.stButton > button[kind="primary"] {background:linear-gradient(180deg,#ffe6a0,#d5a843);color:#35152e;border:2px solid #fff0b4;box-shadow:0 4px 0 #875c28;}
-div[class*="st-key-flip_"] button {height:104px;min-height:150px;width:100%;border-radius:10px;background-color:#78172e !important;background-image:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,211,117,.24) 8px 10px),repeating-linear-gradient(-45deg,transparent 0 8px,rgba(255,211,117,.2) 8px 10px),radial-gradient(ellipse at center,#a72c42 0%,#681329 75%) !important;color:#ffe3a0!important;border:4px solid #f4d58a!important;box-shadow:inset 0 0 0 4px #501020,inset 0 0 0 6px #e6bd67,0 8px 18px rgba(0,0,0,.45)!important;font-family:Georgia,serif;font-size:1.25rem;font-weight:900;white-space:pre-wrap;}
+div[class*="st-key-flip_"] button {position:relative;height:116px;min-height:116px;width:100%;border-radius:11px;background:radial-gradient(ellipse at center,#792944 0%,#4b1832 78%) !important;color:transparent!important;border:3px solid #d9b967!important;box-shadow:inset 0 0 0 3px #351226,inset 0 0 0 5px #e4c575,0 5px 12px rgba(0,0,0,.32)!important;font-family:Georgia,serif;font-size:0!important;white-space:pre-wrap;overflow:hidden;}
+div[class*="st-key-flip_"] button:before {content:"";position:absolute;inset:8px;border:1px solid rgba(255,224,157,.75);border-radius:5px;background:repeating-linear-gradient(45deg,transparent 0 11px,rgba(255,220,145,.09) 11px 13px),repeating-linear-gradient(-45deg,transparent 0 11px,rgba(255,220,145,.09) 11px 13px);}
+div[class*="st-key-flip_"] button:after {content:"✦";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:42px;height:42px;display:grid;place-items:center;border:1px solid #e6c778;border-radius:50%;background:radial-gradient(circle,#8c3550,#511b36);color:#ffe5a0;font-size:1.45rem;text-shadow:0 2px 5px #250d1d;box-shadow:0 0 0 4px rgba(228,197,117,.12);}
 div[class*="st-key-flip_"] button:disabled {opacity:.86;filter:saturate(.85);}
 div[data-testid="stRadio"] label {color:#fff0d0!important;}
 div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,103,.35);}
@@ -65,7 +65,7 @@ div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,10
 div.stButton > button {min-height:2.45rem !important;padding:.35rem .65rem !important;background:linear-gradient(180deg,#6e2447,#42172f) !important;color:#fff1d1 !important;border:2px solid #bd9650 !important;box-shadow:0 3px 0 #241020 !important;}
 div.stButton > button[kind="primary"] {background:linear-gradient(180deg,#ffe6a0,#d5a843) !important;color:#35152e !important;border:2px solid #fff0b4 !important;box-shadow:0 3px 0 #875c28 !important;}
 div.stButton > button:disabled {opacity:.55 !important;color:#cbbca9 !important;}
-div[class*="st-key-flip_"] button {height:116px !important;min-height:116px !important;font-size:1rem !important;}
+div[class*="st-key-flip_"] button {height:116px !important;min-height:116px !important;font-size:0 !important;}
 @media (max-height:700px) {
  .hero {padding:.25rem .6rem !important;}
  .hero h1 {font-size:2rem !important;}
@@ -283,11 +283,11 @@ for i, p in enumerate(players):
                 suit = card["suit"]
                 face = f"{label}{suit}"
                 extra = "card-gold" if rank == 1 else ("card-red" if suit in RED_SUITS else "")
-                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:116px"><div class="card-corner">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div><span class="card-index">CARD {j+1}</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:116px"><div class="card-corner card-top">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div></div>', unsafe_allow_html=True)
             else:
                 is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
                 can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
-                if st.button(f"♛\nCARD {j+1}", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
+                if st.button(" ", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
                     use_free = bool(g.get("host_use_free_flip"))
                     chosen_guess = g.get("host_guess")
                     if use_free and p["free_flips"] > 0:
