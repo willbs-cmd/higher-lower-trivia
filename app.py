@@ -35,6 +35,15 @@ p,div,span,label {font-family:'DM Sans',sans-serif;}
 .card-pip {position:absolute;inset:0;display:grid;place-items:center;font-size:3.25rem;line-height:1;z-index:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
 .card-red {color:#bd263f;}
 .card-gold {background:linear-gradient(145deg,#fff7d8,#f0d38a 72%,#dfbb68);border-color:#f2d991;}
+.active-turn-card {height:164px !important;transform:scale(1.035);z-index:3;box-shadow:0 0 0 3px rgba(255,224,138,.28),0 0 24px rgba(255,204,94,.42),inset 0 0 0 2px #fff !important;animation:activeCardExpand .55s cubic-bezier(.2,.85,.25,1) both;transform-origin:center center;}
+.pip-field {position:absolute;inset:17px 30px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(5,1fr);align-items:center;justify-items:center;z-index:1;}
+.pip {font-size:1.28rem;line-height:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
+.pip-0{grid-column:1;grid-row:1}.pip-1{grid-column:2;grid-row:1}.pip-2{grid-column:1;grid-row:2}.pip-3{grid-column:2;grid-row:2}.pip-4{grid-column:1 / span 2;grid-row:3}.pip-5{grid-column:1 / span 2;grid-row:3}.pip-6{grid-column:1;grid-row:4}.pip-7{grid-column:2;grid-row:4}.pip-8{grid-column:1;grid-row:5}.pip-9{grid-column:2;grid-row:5}
+.pip-4:nth-of-type(10){grid-column:2;grid-row:3}
+.court-mark {position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;font-family:Georgia,serif;font-size:3.6rem;font-weight:900;color:inherit;text-shadow:0 2px 0 rgba(0,0,0,.08);}
+.court-mark span {font-size:3.2rem;}
+@keyframes activeCardExpand {0%{height:116px;transform:scale(.94);filter:brightness(1.25)}65%{height:172px;transform:scale(1.055)}100%{height:164px;transform:scale(1.035);filter:brightness(1)}}
+@media(max-height:700px){.active-turn-card{height:142px !important}.pip-field{inset:15px 24px}.pip{font-size:1.05rem}}
 .scoreboard {display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.25rem 0 .8rem;}
 .score-card {position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(53,24,62,.98),rgba(22,29,57,.98));border:2px solid #c7a65d;border-radius:15px;padding:.8rem 1rem;box-shadow:0 7px 18px rgba(0,0,0,.28);}
 .score-card.player-a {border-top:5px solid #4bb9ef;}.score-card.player-b {border-top:5px solid #f16d75;}
@@ -108,6 +117,25 @@ RANK_LABELS = {1:"A", 11:"J", 12:"Q", 13:"K"}
 
 def make_card():
     return {"rank": random.choice(RANKS), "suit": random.choice(SUITS)}
+
+PIP_POSITIONS = {
+    1: [4],
+    2: [0, 9],
+    3: [0, 4, 9],
+    4: [0, 1, 8, 9],
+    5: [0, 1, 4, 8, 9],
+    6: [0, 1, 2, 7, 8, 9],
+    7: [0, 1, 2, 4, 7, 8, 9],
+    8: [0, 1, 2, 3, 6, 7, 8, 9],
+    9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    10: [0, 1, 2, 3, 6, 7, 8, 9, 4, 5],
+}
+
+def card_pip_pattern(rank, suit):
+    positions = PIP_POSITIONS.get(rank)
+    if not positions:
+        return f'<div class="court-mark">{RANK_LABELS.get(rank, str(rank))}<span>{suit}</span></div>'
+    return '<div class="pip-field">' + ''.join(f'<span class="pip pip-{pos}">{suit}</span>' for pos in positions) + '</div>'
 
 def card_text(card):
     return RANK_LABELS.get(card["rank"], str(card["rank"]))
@@ -316,7 +344,11 @@ for i, p in enumerate(players):
                 face = f"{label}{suit}"
                 extra = "card-gold" if rank == 1 else ("card-red" if suit in RED_SUITS else "")
                 reveal_class = " card-reveal" if g.get("last_reveal") == {"player": i, "index": j} else ""
-                st.markdown(f'<div class="playing-card card-front {extra}{reveal_class}" style="width:100%;height:116px"><div class="card-corner card-top">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div></div>', unsafe_allow_html=True)
+                is_turn_card = i == current and g["winner"] is None and p["progress"] > 0 and j == p["progress"] - 1
+                turn_class = " active-turn-card" if is_turn_card else ""
+                face_pattern = card_pip_pattern(rank, suit) if is_turn_card else f'<div class="card-pip">{suit}</div>'
+                card_height = 164 if is_turn_card else 116
+                st.markdown(f'<div class="playing-card card-front {extra}{reveal_class}{turn_class}" style="width:100%;height:{card_height}px"><div class="card-corner card-top">{label}<small>{suit}</small></div>{face_pattern}<div class="card-corner card-bottom">{label}<small>{suit}</small></div></div>', unsafe_allow_html=True)
             else:
                 is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
                 can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
