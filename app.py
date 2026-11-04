@@ -380,9 +380,8 @@ else:
     st.markdown(f"### {active['name']}, make your call")
     idx = active["progress"]
     if idx < 5:
-        previous = active["row"][idx-1]
-        prev_label = RANK_LABELS.get(previous["rank"], str(previous["rank"]))
-        st.markdown(f'<div class="panel" style="text-align:center"><div class="stat">Your current card</div><div style="font-size:3rem;font-weight:800;color:#f2d58b">{prev_label} {previous["suit"]}</div><div class="muted">Will the next card be higher or lower?</div></div>', unsafe_allow_html=True)
+        # The current card is already visible in the player's row above.
+        # Keep the call buttons directly below the playing table without a duplicate card panel.
         if active["free_flips"] > 0:
             if st.button(f"✨ Prepare Free Flip ({active['free_flips']}) — then click the card", type="secondary", use_container_width=True):
                 g["host_guess"] = None
