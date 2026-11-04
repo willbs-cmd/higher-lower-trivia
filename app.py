@@ -35,6 +35,30 @@ p,div,span,label {font-family:'DM Sans',sans-serif;}
 .card-pip {position:absolute;inset:0;display:grid;place-items:center;font-size:3.25rem;line-height:1;z-index:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
 .card-red {color:#bd263f;}
 .card-gold {background:linear-gradient(145deg,#fff7d8,#f0d38a 72%,#dfbb68);border-color:#f2d991;}
+.scoreboard {display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.25rem 0 .8rem;}
+.score-card {position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(53,24,62,.98),rgba(22,29,57,.98));border:2px solid #c7a65d;border-radius:15px;padding:.8rem 1rem;box-shadow:0 7px 18px rgba(0,0,0,.28);}
+.score-card.player-a {border-top:5px solid #4bb9ef;}.score-card.player-b {border-top:5px solid #f16d75;}
+.score-top {display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.score-name {font-size:1.05rem;font-weight:900;color:#fff7e5;}
+.score-bank {font-size:2rem;line-height:1.1;font-weight:900;color:#ffdf8c;text-shadow:0 2px 10px rgba(0,0,0,.65);}
+.score-label {font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:#e8d3a5;font-weight:800;}
+.score-meta {display:flex;gap:1rem;align-items:center;color:#eadbc4;font-size:.78rem;margin-top:.45rem;}
+.ladder {display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:.65rem;}
+.ladder-step {height:7px;border-radius:8px;background:rgba(255,255,255,.13);border:1px solid rgba(255,226,154,.2);}
+.ladder-step.done {background:linear-gradient(90deg,#f3c45d,#fff0ad);box-shadow:0 0 9px rgba(255,210,105,.35);}
+.score-active {font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#ffe08b;}
+.card-reveal {animation:cardReveal .62s cubic-bezier(.2,.8,.2,1) both;transform-origin:center;}
+@keyframes cardReveal {0%{opacity:.15;transform:rotateY(88deg) scale(.88);filter:brightness(1.8);}55%{opacity:1;transform:rotateY(-9deg) scale(1.04);filter:brightness(1.3);}100%{transform:rotateY(0) scale(1);filter:brightness(1);}}
+.winner-stage {position:relative;overflow:hidden;text-align:center;padding:2.3rem 1rem 2rem;border:3px solid #ffe29a;border-radius:22px;background:radial-gradient(ellipse at 50% 0%,#9a3158 0%,#4c1a45 42%,#171a39 100%);box-shadow:0 0 0 7px rgba(255,220,130,.12),0 0 55px rgba(255,196,79,.3);animation:winnerPop .8s cubic-bezier(.18,.85,.3,1.2) both;}
+.winner-stage:before,.winner-stage:after {content:"✦  ✧  ★  ✧  ✦";position:absolute;left:0;right:0;color:#ffe7a1;letter-spacing:1.2rem;font-size:1.2rem;opacity:.8;animation:sparkle 2s ease-in-out infinite alternate;}
+.winner-stage:before {top:12px;}.winner-stage:after {bottom:12px;}
+.winner-kicker {font-size:.8rem;letter-spacing:.28em;font-weight:900;color:#ffe7a1;text-transform:uppercase;}
+.winner-name {font-family:'Playfair Display',serif;font-size:clamp(2.3rem,6vw,4.6rem);font-weight:900;color:#fff4d4;text-shadow:0 4px 0 #78294a,0 8px 22px #000;margin:.4rem 0;}
+.winner-prize {font-size:clamp(3rem,8vw,5.8rem);font-weight:1000;line-height:1;color:#ffe08a;text-shadow:0 4px 0 #875c28,0 0 30px rgba(255,220,130,.5);margin:.7rem 0;}
+.winner-sub {color:#fff0ce;font-size:1rem;font-weight:700;}
+@keyframes winnerPop {0%{opacity:0;transform:scale(.82) translateY(18px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes sparkle {from{opacity:.35;transform:translateY(-3px);}to{opacity:1;transform:translateY(3px);}}
+@media(max-width:650px){.scoreboard{grid-template-columns:1fr;}.score-bank{font-size:1.7rem;}.winner-stage{padding:2rem .5rem;}}
 .event {background:linear-gradient(100deg,rgba(116,27,54,.92),rgba(52,31,65,.95));border:2px solid #d9b65e;border-radius:13px;padding:1rem;color:#fff0c7;box-shadow:0 7px 20px rgba(0,0,0,.2);}
 .muted {color:#d8c5bd;}
 div.stButton > button {border-radius:12px;font-weight:900;min-height:2.8rem;border:2px solid #d8b86b;letter-spacing:.025em;transition:transform .12s ease,filter .12s ease;}
@@ -101,7 +125,7 @@ def fresh_game(names):
     for name in names:
         players.append({"name": name, "row": new_row(), "progress": 1, "aces": 0, "free_flips": 0})
     return {"players": players, "current": 0, "pending": None, "winner": None,
-            "log": [f"{names[0]} starts the challenge."], "last_message": "Host: ask the player for Higher or Lower, then click their next face-down card.", "host_guess": None, "host_use_free_flip": False}
+            "log": [f"{names[0]} starts the challenge."], "last_message": "Host: ask the player for Higher or Lower, then click their next face-down card.", "host_guess": None, "host_use_free_flip": False, "last_reveal": None}
 
 def log(message):
     st.session_state.game["log"].insert(0, message)
@@ -152,6 +176,7 @@ def resolve_reveal(player_index, free=False, guess=None):
     previous = p["row"][idx - 1]
     card = p["row"][idx]
     p["revealed"] = idx
+    g["last_reveal"] = {"player": player_index, "index": idx}
     rank = card["rank"]
 
     if rank == 1:
@@ -262,14 +287,16 @@ players = g["players"]
 current = g["current"]
 active = players[current]
 
-# ---------- Scoreboard ----------
-cols = st.columns(2)
-for i, col in enumerate(cols):
-    p = players[i]
-    with col:
-        cls = "player-a" if i == 0 else "player-b"
-        active_label = '<div class="playing">● Playing now</div>' if i == current and not g["winner"] else '<div class="muted">Waiting</div>'
-        st.markdown(f'<div class="panel {cls}"><div class="player-name">{p["name"]}</div>{active_label}<div style="display:flex;justify-content:space-between;gap:8px;margin-top:14px"><div><div class="stat">Cards</div><div class="big-stat">{p["progress"]}/5</div></div><div><div class="stat">Prize bank</div><div class="big-stat">£{prize_money(p["progress"]):,}</div></div><div><div class="stat">Aces</div><div class="big-stat">🂡 {p["aces"]}</div></div><div><div class="stat">Free flips</div><div class="big-stat">✨ {p["free_flips"]}</div></div></div></div>', unsafe_allow_html=True)
+# ---------- Game-show scoreboard ----------
+st.markdown('<div class="eyebrow" style="text-align:center;margin:.25rem 0">THE CASH DASH · LIVE SCOREBOARD</div>', unsafe_allow_html=True)
+score_html = ['<div class="scoreboard">']
+for i, p in enumerate(players):
+    cls = "player-a" if i == 0 else "player-b"
+    status = '<span class="score-active">● Playing now</span>' if i == current and g["winner"] is None else '<span class="muted">Waiting</span>'
+    steps = ''.join(f'<span class="ladder-step {"done" if n <= p["progress"] else ""}"></span>' for n in range(1, 6))
+    score_html.append(f'<div class="score-card {cls}"><div class="score-top"><div><div class="score-name">{p["name"]}</div>{status}</div><div style="text-align:right"><div class="score-label">Prize bank</div><div class="score-bank">£{prize_money(p["progress"]):,}</div></div></div><div class="score-meta"><span>🂡 {p["aces"]} Aces</span><span>✨ {p["free_flips"]} Free flips</span><span>{p["progress"]}/5 cards</span></div><div class="ladder">{steps}</div></div>')
+score_html.append('</div>')
+st.markdown(''.join(score_html), unsafe_allow_html=True)
 
 # ---------- Card rows: host clicks to reveal ----------
 st.markdown("### THE PLAYING TABLE")
@@ -288,7 +315,8 @@ for i, p in enumerate(players):
                 suit = card["suit"]
                 face = f"{label}{suit}"
                 extra = "card-gold" if rank == 1 else ("card-red" if suit in RED_SUITS else "")
-                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:116px"><div class="card-corner card-top">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div></div>', unsafe_allow_html=True)
+                reveal_class = " card-reveal" if g.get("last_reveal") == {"player": i, "index": j} else ""
+                st.markdown(f'<div class="playing-card card-front {extra}{reveal_class}" style="width:100%;height:116px"><div class="card-corner card-top">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div></div>', unsafe_allow_html=True)
             else:
                 is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
                 can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
@@ -310,7 +338,7 @@ st.markdown(f'<div class="event"><b>TURN UPDATE</b><br>{g["last_message"]}</div>
 if g["winner"] is not None:
     winner = players[g["winner"]]["name"]
     st.balloons()
-    st.markdown(f'<div class="panel" style="text-align:center;padding:2rem"><div class="eyebrow">Challenge complete · Grand jackpot</div><h1>🏆 {winner} wins!</h1><div style="font-size:3.2rem;font-weight:900;color:#ffdf8c;text-shadow:0 3px 12px #000">£{prize_money(players[g["winner"]]["progress"]):,}</div><p class="muted">All five cards cleared. The £1,000 grand prize is yours!</p></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="winner-stage"><div class="winner-kicker">Ladies and gentlemen · We have a champion!</div><div class="winner-name">🏆 {winner.upper()}! 🏆</div><div class="winner-sub">HAS CLEARED ALL FIVE CARDS</div><div class="winner-prize">£{prize_money(players[g["winner"]]["progress"]):,}</div><div class="winner-sub">THE £1,000 GRAND JACKPOT WINNER!</div></div>', unsafe_allow_html=True)
     if st.button("Play another game", type="primary", use_container_width=True):
         st.session_state.setup = True
         st.session_state.game = None
