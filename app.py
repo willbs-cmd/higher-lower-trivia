@@ -247,7 +247,7 @@ for i, p in enumerate(players):
             else:
                 is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
                 can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
-                if st.button(f"♛\\nCARD {j+1}", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
+                if st.button(f"♛\nCARD {j+1}", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
                     use_free = bool(g.get("host_use_free_flip"))
                     chosen_guess = g.get("host_guess")
                     if use_free and p["free_flips"] > 0:
