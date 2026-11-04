@@ -88,6 +88,11 @@ def make_card():
 def card_text(card):
     return RANK_LABELS.get(card["rank"], str(card["rank"]))
 
+PRIZE_LADDER = {1: 0, 2: 100, 3: 250, 4: 500, 5: 1000}
+
+def prize_money(progress):
+    return PRIZE_LADDER.get(min(5, max(1, progress)), 0)
+
 def new_row():
     return [make_card() for _ in range(5)]
 
@@ -235,7 +240,7 @@ if "game" not in st.session_state:
 st.markdown('<div class="hero"><div class="eyebrow">Ladies and gentlemen · Your Saturday night game show</div><h1>Higher or Lower!</h1><div class="subtitle">THE TRIVIA CHALLENGE · BIG CARDS · BIG CALLS · BIG DRAMA</div></div>', unsafe_allow_html=True)
 
 if st.session_state.get("setup", True):
-    st.markdown('<div class="panel"><h3 style="text-align:center">Set up the table</h3><p class="muted" style="text-align:center">Two players. Five cards each. First to turn over all five wins.</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="panel"><h3 style="text-align:center">Set up the table</h3><p class="muted" style="text-align:center">Two players. Five cards each. Clear the cards, climb the prize ladder and win the £1,000 jackpot.</p></div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         name1 = st.text_input("Player 1", value="Player 1", max_chars=18)
@@ -249,7 +254,7 @@ if st.session_state.get("setup", True):
             st.session_state.game = fresh_game(names)
             st.session_state.setup = False
             st.rerun()
-    st.markdown('<div class="panel"><h3>How to play</h3><p>Guess whether the next card is <b>Higher</b> or <b>Lower</b> than the last one. Correct guesses let you continue. A wrong guess resets your row and passes the turn.</p><p><b>Pairs:</b> matching numbers freeze your progress and end your turn. <b>Odd cards (3, 5, 7, 9):</b> trigger a trivia trap. The host asks a question from their own collection and records whether the answer is right or wrong. If wrong, the opponent can steal.</p><p><b>Aces:</b> pocket them and spend them later to survive a wrong guess, break a Pair freeze, or skip a trivia question. <b>Free Flip:</b> a successful steal earns one automatic advance on your next turn.</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="panel"><h3>Prize ladder</h3><p><b>2 cards:</b> £100 &nbsp; · &nbsp; <b>3 cards:</b> £250 &nbsp; · &nbsp; <b>4 cards:</b> £500 &nbsp; · &nbsp; <b>5 cards:</b> £1,000 JACKPOT</p><p class="muted">Your prize bank follows your progress. Lose a card and your bank drops to the previous prize level.</p></div><div class="panel"><h3>How to play</h3><p>Guess whether the next card is <b>Higher</b> or <b>Lower</b> than the last one. Correct guesses let you continue. A wrong guess resets your row and passes the turn.</p><p><b>Pairs:</b> matching numbers freeze your progress and end your turn. <b>Odd cards (3, 5, 7, 9):</b> trigger a trivia trap. The host asks a question from their own collection and records whether the answer is right or wrong. If wrong, the opponent can steal.</p><p><b>Aces:</b> pocket them and spend them later to survive a wrong guess, break a Pair freeze, or skip a trivia question. <b>Prize money:</b> your bank rises as you clear cards, but drops if you lose progress. First to five cards wins the £1,000 jackpot.</p></div>', unsafe_allow_html=True)
     st.stop()
 
 g = st.session_state.game
@@ -264,7 +269,7 @@ for i, col in enumerate(cols):
     with col:
         cls = "player-a" if i == 0 else "player-b"
         active_label = '<div class="playing">● Playing now</div>' if i == current and not g["winner"] else '<div class="muted">Waiting</div>'
-        st.markdown(f'<div class="panel {cls}"><div class="player-name">{p["name"]}</div>{active_label}<div style="display:flex;justify-content:space-between;margin-top:14px"><div><div class="stat">Cards cleared</div><div class="big-stat">{p["progress"]}/5</div></div><div><div class="stat">Aces</div><div class="big-stat">🂡 {p["aces"]}</div></div><div><div class="stat">Free flips</div><div class="big-stat">✨ {p["free_flips"]}</div></div></div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="panel {cls}"><div class="player-name">{p["name"]}</div>{active_label}<div style="display:flex;justify-content:space-between;gap:8px;margin-top:14px"><div><div class="stat">Cards</div><div class="big-stat">{p["progress"]}/5</div></div><div><div class="stat">Prize bank</div><div class="big-stat">£{prize_money(p["progress"]):,}</div></div><div><div class="stat">Aces</div><div class="big-stat">🂡 {p["aces"]}</div></div><div><div class="stat">Free flips</div><div class="big-stat">✨ {p["free_flips"]}</div></div></div></div>', unsafe_allow_html=True)
 
 # ---------- Card rows: host clicks to reveal ----------
 st.markdown("### THE PLAYING TABLE")
@@ -305,7 +310,7 @@ st.markdown(f'<div class="event"><b>TURN UPDATE</b><br>{g["last_message"]}</div>
 if g["winner"] is not None:
     winner = players[g["winner"]]["name"]
     st.balloons()
-    st.markdown(f'<div class="panel" style="text-align:center;padding:2rem"><div class="eyebrow">Challenge complete</div><h1>🏆 {winner} wins!</h1><p class="muted">All five cards successfully revealed. A brilliant run.</p></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="panel" style="text-align:center;padding:2rem"><div class="eyebrow">Challenge complete · Grand jackpot</div><h1>🏆 {winner} wins!</h1><div style="font-size:3.2rem;font-weight:900;color:#ffdf8c;text-shadow:0 3px 12px #000">£{prize_money(players[g["winner"]]["progress"]):,}</div><p class="muted">All five cards cleared. The £1,000 grand prize is yours!</p></div>', unsafe_allow_html=True)
     if st.button("Play another game", type="primary", use_container_width=True):
         st.session_state.setup = True
         st.session_state.game = None
