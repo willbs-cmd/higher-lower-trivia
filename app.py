@@ -161,31 +161,43 @@ def resolve_reveal(player_index, free=False, guess=None):
 def answer_trivia(correct, stealing=False):
     g = st.session_state.game
     pending = g["pending"]
-    actor = 1 - pending["player"] if stealing else pending["player"]
+    original_player = pending["player"]
+    actor = 1 - original_player if stealing else original_player
     p = g["players"][actor]
+
     if correct:
-        if stealing:
-            p["free_flips"] += 1
-            log(f"{p['name']} successfully stole the host's trivia question and earned a Free Flip.")
-            switch_turn(f"Steal successful! {p['name']} earns a Free Flip and takes the turn.")
-        else:
-            p["progress"] += 1
-            log(f"{p['name']} answered the host's trivia question correctly.")
-            g["pending"] = None
-            g["last_message"] = "Correct answer! The trap is beaten — make your next call."
-            win_check(actor)
+        p["progress"] += 1
+        log(f"{p['name']} answered the host's trivia question correctly and moved forward one card.")
+        g["pending"] = None
+        g["host_guess"] = None
+        g["host_use_free_flip"] = False
+        g["current"] = actor
+        g["last_message"] = (
+            f"Correct! {p['name']} steals the question, moves forward one card and keeps the turn. "
+            "Make the next Higher or Lower call."
+            if stealing else
+            f"Correct! {p['name']} beats the trivia trap and can make the next call."
+        )
+        win_check(actor)
     else:
+        lose_one(actor)
+        log(f"{p['name']} answered the trivia question incorrectly and moved back one card.")
+        g["pending"] = None
+        g["host_guess"] = None
+        g["host_use_free_flip"] = False
         if stealing:
-            lose_one(actor)
-            log(f"{p['name']} failed the trivia steal and lost one card.")
-            switch_turn(f"Failed steal. {p['name']} loses one card. The other player takes the turn.")
+            # A failed steal sends play back to the player who originally hit the trap.
+            g["current"] = original_player
+            g["last_message"] = (
+                f"Wrong answer! {p['name']} moves back one card. "
+                f"{g['players'][original_player]['name']} gets the turn back."
+            )
         else:
-            trap_index = p["progress"]
-            lose_one(actor)
-            p["row"][trap_index] = make_card()
-            g["pending"] = {"type":"steal", "player":actor}
-            log(f"{p['name']} missed the host's trivia question and moved back one card.")
-            g["last_message"] = f"Wrong answer. {g['players'][1-actor]['name']} can now steal the host's question."
+            g["pending"] = {"type":"steal", "player":original_player}
+            g["last_message"] = (
+                f"Wrong answer! {p['name']} moves back one card. "
+                f"{g['players'][1-actor]['name']} can now answer the same question to steal."
+            )
 
 # ---------- Setup ----------
 if "game" not in st.session_state:
