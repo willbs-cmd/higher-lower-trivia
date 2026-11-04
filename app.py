@@ -7,8 +7,12 @@ st.set_page_config(page_title="Higher or Lower | Trivia Challenge", page_icon="�
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
-.stApp {background:radial-gradient(ellipse at 50% 0%,#4b1730 0%,#24132c 38%,#101426 78%,#090d19 100%);color:#fff5df;}
-.block-container {max-width:1240px;padding-top:1.4rem;padding-bottom:3rem;}
+html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stMainBlockContainer"], .stApp, section.main {background:radial-gradient(ellipse at 50% 0%,#632044 0%,#29132f 42%,#111426 82%,#080b16 100%) !important;color:#fff5df !important;}
+[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecoration"], footer {background:transparent !important;}
+[data-testid="stHeader"] {height:0;visibility:hidden;}
+.block-container {max-width:1320px;padding-top:1.1rem;padding-bottom:3rem;background:transparent !important;}
+.stApp, .stApp * {color-scheme:dark;}
+[data-testid="stVerticalBlock"] {background:transparent;}
 h1,h2,h3 {font-family:'Playfair Display',serif !important;color:#fff3d1;}
 p,div,span,label {font-family:'DM Sans',sans-serif;}
 .hero {text-align:center;padding:1.1rem 1rem 1.5rem;border:3px solid #d9b65e;border-radius:22px;background:linear-gradient(110deg,rgba(100,18,47,.94),rgba(29,24,58,.96),rgba(100,18,47,.94));box-shadow:0 0 0 5px rgba(217,182,94,.12),0 0 35px rgba(241,187,77,.22);margin-bottom:1.2rem;}
@@ -21,16 +25,24 @@ p,div,span,label {font-family:'DM Sans',sans-serif;}
 .stat {color:#f1d8a4;font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;}
 .big-stat {font-size:1.65rem;font-weight:800;color:#ffdc82;text-shadow:0 2px 8px #000;}
 .playing {color:#ffe08b;font-weight:800;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;}
-.card-back {background:repeating-linear-gradient(135deg,#6c1738 0px,#6c1738 8px,#a52e4e 8px,#a52e4e 16px);border:3px solid #f4d58a;color:#fff4d8;box-shadow:inset 0 0 0 4px rgba(255,225,155,.18),0 8px 18px rgba(0,0,0,.35);}
-.card-front {background:linear-gradient(145deg,#fffef8,#e9dfcc);color:#211a29;border:3px solid #f5d98d;box-shadow:0 8px 18px rgba(0,0,0,.35);}
-.card-red {color:#bd2446;}.card-gold {background:linear-gradient(145deg,#fff3c5,#e4b84f);border:3px solid #fff0ad;}
-.card-value {font-size:1.7rem;line-height:1;}.card-suit {font-size:1.1rem;align-self:flex-end;}.card-index {font-size:.62rem;color:#9ca9b8;}
+.playing-card {position:relative;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:9px 10px;border-radius:10px;overflow:hidden;font-family:Georgia,serif;}
+.card-front {background:linear-gradient(135deg,#fffef9 0%,#f5eedf 58%,#e5dac5 100%);color:#171522;border:3px solid #e9c979;box-shadow:inset 0 0 0 2px #fff,0 8px 18px rgba(0,0,0,.42);}
+.card-front:before {content:"";position:absolute;inset:5px;border:1px solid rgba(150,117,65,.35);border-radius:5px;pointer-events:none;}
+.card-corner {font-size:1.3rem;font-weight:900;line-height:.9;z-index:1;text-align:center;}
+.card-corner small {display:block;font-size:.85rem;margin-top:3px;}
+.card-pip {position:absolute;inset:0;display:grid;place-items:center;font-size:3.1rem;line-height:1;text-shadow:0 1px 0 rgba(0,0,0,.08);}
+.card-bottom {position:absolute;right:9px;bottom:8px;transform:rotate(180deg);}
+.card-red {color:#c3223e;}
+.card-gold {background:linear-gradient(145deg,#fff5ce,#e8bd62);border-color:#fff0b1;}
+.card-index {position:absolute;bottom:5px;left:0;right:0;text-align:center;font:600 .48rem 'DM Sans',sans-serif;letter-spacing:.12em;color:#9c8a6c;opacity:.85;}
+.card-back-face {background-color:#78172e !important;background-image:repeating-linear-gradient(45deg,transparent 0 7px,rgba(255,211,117,.24) 7px 9px),repeating-linear-gradient(-45deg,transparent 0 7px,rgba(255,211,117,.2) 7px 9px),radial-gradient(ellipse at center,#a72c42 0%,#681329 75%) !important;border:3px solid #f4d58a !important;box-shadow:inset 0 0 0 4px #501020,inset 0 0 0 6px #e6bd67,0 8px 18px rgba(0,0,0,.42) !important;}
+.card-back-face div {border:1px solid rgba(255,218,135,.75);height:100%;width:100%;border-radius:5px;display:grid;place-items:center;font-size:2rem;color:#f7d67e;text-shadow:0 2px 4px #300914;}
 .event {background:linear-gradient(100deg,rgba(116,27,54,.92),rgba(52,31,65,.95));border:2px solid #d9b65e;border-radius:13px;padding:1rem;color:#fff0c7;box-shadow:0 7px 20px rgba(0,0,0,.2);}
 .muted {color:#d8c5bd;}
 div.stButton > button {border-radius:12px;font-weight:900;min-height:2.8rem;border:2px solid #d8b86b;letter-spacing:.025em;transition:transform .12s ease,filter .12s ease;}
 div.stButton > button:hover {transform:translateY(-2px);filter:brightness(1.12);border-color:#fff0b4;}
 div.stButton > button[kind="primary"] {background:linear-gradient(180deg,#ffe6a0,#d5a843);color:#35152e;border:2px solid #fff0b4;box-shadow:0 4px 0 #875c28;}
-div[class*="st-key-flip_"] button {height:118px;min-height:118px;width:100%;border-radius:13px;background:repeating-linear-gradient(135deg,#6c1738 0px,#6c1738 8px,#a52e4e 8px,#a52e4e 16px)!important;color:#fff3d3!important;border:3px solid #f4d58a!important;box-shadow:inset 0 0 0 4px rgba(255,225,155,.18),0 8px 18px rgba(0,0,0,.38)!important;font-size:1.1rem;font-weight:900;white-space:pre-wrap;}
+div[class*="st-key-flip_"] button {height:150px;min-height:150px;width:100%;border-radius:10px;background-color:#78172e !important;background-image:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,211,117,.24) 8px 10px),repeating-linear-gradient(-45deg,transparent 0 8px,rgba(255,211,117,.2) 8px 10px),radial-gradient(ellipse at center,#a72c42 0%,#681329 75%) !important;color:#ffe3a0!important;border:4px solid #f4d58a!important;box-shadow:inset 0 0 0 4px #501020,inset 0 0 0 6px #e6bd67,0 8px 18px rgba(0,0,0,.45)!important;font-family:Georgia,serif;font-size:1.25rem;font-weight:900;white-space:pre-wrap;}
 div[class*="st-key-flip_"] button:disabled {opacity:.86;filter:saturate(.85);}
 div[data-testid="stRadio"] label {color:#fff0d0!important;}
 div[data-testid="stAlert"] {border-radius:12px;}hr {border-color:rgba(231,192,103,.35);}</style>
@@ -231,11 +243,11 @@ for i, p in enumerate(players):
                 suit = card["suit"]
                 face = f"{label}{suit}"
                 extra = "card-gold" if rank == 1 else ("card-red" if suit in RED_SUITS else "")
-                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:112px"><span class="card-value">{face}</span><span class="card-index">CARD {j+1}</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:150px"><div class="card-corner">{label}<small>{suit}</small></div><div class="card-pip">{suit}</div><div class="card-corner card-bottom">{label}<small>{suit}</small></div><span class="card-index">CARD {j+1}</span></div>', unsafe_allow_html=True)
             else:
                 is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
                 can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
-                if st.button(f"✦ CARD {j+1} ✦", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
+                if st.button(f"♛\\nCARD {j+1}", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
                     use_free = bool(g.get("host_use_free_flip"))
                     chosen_guess = g.get("host_guess")
                     if use_free and p["free_flips"] > 0:
