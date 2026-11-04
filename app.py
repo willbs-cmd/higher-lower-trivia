@@ -194,10 +194,10 @@ def answer_trivia(answer, stealing=False):
             log(f"{p['name']} failed the steal and lost one card.")
             switch_turn(f"Failed steal. {p['name']} loses one card, but now takes the turn.")
         else:
+            trap_index = p["progress"]
             lose_one(actor)
-            # Replace the trap card with a fresh face-down card.
-            idx = min(p["progress"], 4)
-            p["row"][idx] = make_card()
+            # The trap card itself is also replaced face-down.
+            p["row"][trap_index] = make_card()
             g["pending"] = {"type":"steal", "player":actor, "question":q}
             log(f"{p['name']} missed the trivia trap and moved back one card.")
             g["last_message"] = f"Wrong answer. {g['players'][1-actor]['name']} can now steal the same question."
