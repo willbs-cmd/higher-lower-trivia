@@ -40,28 +40,7 @@ SUITS = ["♠", "♥", "♦", "♣"]
 RED_SUITS = {"♥", "♦"}
 RANKS = list(range(1, 14))
 RANK_LABELS = {1:"A", 11:"J", 12:"Q", 13:"K"}
-TRIVIA = [
-    ("Which planet is known as the Red Planet?", ["Venus", "Mars", "Jupiter", "Mercury"], "Mars"),
-    ("What is the capital city of Canada?", ["Toronto", "Vancouver", "Ottawa", "Montreal"], "Ottawa"),
-    ("How many sides does a hexagon have?", ["Five", "Six", "Seven", "Eight"], "Six"),
-    ("Which ocean is the largest?", ["Atlantic", "Indian", "Arctic", "Pacific"], "Pacific"),
-    ("Who wrote 'Pride and Prejudice'?", ["Jane Austen", "Mary Shelley", "Emily Brontë", "Charles Dickens"], "Jane Austen"),
-    ("What is the chemical symbol for gold?", ["Ag", "Go", "Au", "Gd"], "Au"),
-    ("In which country would you find the city of Kyoto?", ["China", "Japan", "Thailand", "South Korea"], "Japan"),
-    ("How many players are on the pitch for one football team at kick-off?", ["9", "10", "11", "12"], "11"),
-    ("Which animal is the largest mammal?", ["African elephant", "Blue whale", "Giraffe", "Orca"], "Blue whale"),
-    ("What is the hardest natural substance?", ["Quartz", "Diamond", "Granite", "Iron"], "Diamond"),
-    ("Which language has the most native speakers worldwide?", ["English", "Spanish", "Mandarin Chinese", "Hindi"], "Mandarin Chinese"),
-    ("What is the smallest prime number?", ["0", "1", "2", "3"], "2"),
-    ("Which artist painted the Mona Lisa?", ["Michelangelo", "Raphael", "Leonardo da Vinci", "Van Gogh"], "Leonardo da Vinci"),
-    ("How many rings are on the Olympic flag?", ["Four", "Five", "Six", "Seven"], "Five"),
-    ("What is the currency of Switzerland?", ["Euro", "Swiss franc", "Krone", "Zloty"], "Swiss franc"),
-    ("Which gas do plants absorb from the atmosphere?", ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"], "Carbon dioxide"),
-    ("What is the tallest mountain above sea level?", ["K2", "Kilimanjaro", "Everest", "Denali"], "Everest"),
-    ("Which year did the first human land on the Moon?", ["1965", "1969", "1972", "1975"], "1969"),
-    ("What is the largest desert on Earth?", ["Sahara", "Gobi", "Arabian", "Antarctic"], "Antarctic"),
-    ("Which instrument has 88 keys on a standard version?", ["Violin", "Piano", "Harp", "Accordion"], "Piano"),
-]
+# Trivia questions are supplied verbally by the host; none are built into the app.
 
 def make_card():
     return {"rank": random.choice(RANKS), "suit": random.choice(SUITS)}
@@ -149,8 +128,7 @@ def resolve_reveal(player_index, free=False, guess=None):
         return
 
     if rank in (3, 5, 7, 9):
-        q = random.choice(TRIVIA)
-        g["pending"] = {"type":"trivia", "player":player_index, "question":q, "card":card, "free":free}
+        g["pending"] = {"type":"trivia", "player":player_index, "card":card, "free":free}
         g["last_message"] = f"Trivia trap! {p['name']} must answer correctly to keep the run alive."
         return
 
@@ -168,36 +146,34 @@ def resolve_reveal(player_index, free=False, guess=None):
     g["last_message"] = f"Correct! {p['name']} can make another call."
     win_check(player_index)
 
-def answer_trivia(answer, stealing=False):
+def answer_trivia(correct, stealing=False):
     g = st.session_state.game
     pending = g["pending"]
-    q = pending["question"]
     actor = 1 - pending["player"] if stealing else pending["player"]
     p = g["players"][actor]
-    if answer == q[2]:
+    if correct:
         if stealing:
             p["free_flips"] += 1
-            log(f"{p['name']} stole the trivia question and earned a Free Flip.")
+            log(f"{p['name']} successfully stole the host's trivia question and earned a Free Flip.")
             switch_turn(f"Steal successful! {p['name']} earns a Free Flip and takes the turn.")
         else:
             p["progress"] += 1
-            log(f"{p['name']} answered the trivia trap correctly.")
+            log(f"{p['name']} answered the host's trivia question correctly.")
             g["pending"] = None
             g["last_message"] = "Correct answer! The trap is beaten — make your next call."
             win_check(actor)
     else:
         if stealing:
             lose_one(actor)
-            log(f"{p['name']} failed the steal and lost one card.")
-            switch_turn(f"Failed steal. {p['name']} loses one card, but now takes the turn.")
+            log(f"{p['name']} failed the trivia steal and lost one card.")
+            switch_turn(f"Failed steal. {p['name']} loses one card. The other player takes the turn.")
         else:
             trap_index = p["progress"]
             lose_one(actor)
-            # The trap card itself is also replaced face-down.
             p["row"][trap_index] = make_card()
-            g["pending"] = {"type":"steal", "player":actor, "question":q}
-            log(f"{p['name']} missed the trivia trap and moved back one card.")
-            g["last_message"] = f"Wrong answer. {g['players'][1-actor]['name']} can now steal the same question."
+            g["pending"] = {"type":"steal", "player":actor}
+            log(f"{p['name']} missed the host's trivia question and moved back one card.")
+            g["last_message"] = f"Wrong answer. {g['players'][1-actor]['name']} can now steal the host's question."
 
 # ---------- Setup ----------
 if "game" not in st.session_state:
@@ -221,7 +197,7 @@ if st.session_state.get("setup", True):
             st.session_state.game = fresh_game(names)
             st.session_state.setup = False
             st.rerun()
-    st.markdown('<div class="panel"><h3>How to play</h3><p>Guess whether the next card is <b>Higher</b> or <b>Lower</b> than the last one. Correct guesses let you continue. A wrong guess resets your row and passes the turn.</p><p><b>Pairs:</b> matching numbers freeze your progress and end your turn. <b>Odd cards (3, 5, 7, 9):</b> trigger a trivia trap. Get it right to continue; get it wrong and lose one card — then your opponent can steal the question.</p><p><b>Aces:</b> pocket them and spend them later to survive a wrong guess, break a Pair freeze, or skip a trivia question. <b>Free Flip:</b> a successful steal earns one automatic advance on your next turn.</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="panel"><h3>How to play</h3><p>Guess whether the next card is <b>Higher</b> or <b>Lower</b> than the last one. Correct guesses let you continue. A wrong guess resets your row and passes the turn.</p><p><b>Pairs:</b> matching numbers freeze your progress and end your turn. <b>Odd cards (3, 5, 7, 9):</b> trigger a trivia trap. The host asks a question from their own collection and records whether the answer is right or wrong. If wrong, the opponent can steal.</p><p><b>Aces:</b> pocket them and spend them later to survive a wrong guess, break a Pair freeze, or skip a trivia question. <b>Free Flip:</b> a successful steal earns one automatic advance on your next turn.</p></div>', unsafe_allow_html=True)
     st.stop()
 
 g = st.session_state.game
@@ -328,22 +304,28 @@ if pending:
     elif kind in ("trivia", "steal"):
         stealing = kind == "steal"
         actor = 1 - pending["player"] if stealing else pending["player"]
-        q = pending["question"]
-        st.markdown("### " + ("🎯 Steal the question" if stealing else "⚡ Trivia trap"))
-        st.info(f"**{players[actor]['name']}** — {q[0]}")
+        st.markdown("### " + ("🎯 STEAL THE QUESTION!" if stealing else "⚡ TRIVIA TRAP!"))
+        st.info(f"**Host:** Ask {players[actor]['name']} one of your own trivia questions. When they answer, record the result below.")
         if not stealing and players[actor]["aces"] > 0:
-            if st.button(f"🂡 Spend an Ace to skip this question ({players[actor]['aces']} available)", type="secondary"):
+            if st.button(f"🂡 Spend an Ace to skip the question ({players[actor]['aces']} available)", type="secondary"):
                 players[actor]["aces"] -= 1
                 players[actor]["progress"] += 1
-                log(f"{players[actor]['name']} spent an Ace to skip a trivia trap.")
+                log(f"{players[actor]['name']} spent an Ace to skip the host's trivia question.")
                 g["pending"] = None
                 g["last_message"] = "Ace spent. Trivia trap skipped — make your next call."
                 win_check(actor)
                 st.rerun()
-        choice = st.radio("Choose your answer", q[1], key=f"answer_{kind}_{len(g['log'])}")
-        if st.button("Lock in answer", type="primary", use_container_width=True):
-            answer_trivia(choice, stealing=stealing)
-            st.rerun()
+        st.caption("The host decides whether the answer is correct. No trivia questions or answers are shown on screen.")
+        a, b = st.columns(2)
+        with a:
+            if st.button("✓ Correct answer", type="primary", use_container_width=True):
+                answer_trivia(True, stealing=stealing)
+                st.rerun()
+        with b:
+            if st.button("✕ Wrong answer", type="secondary", use_container_width=True):
+                answer_trivia(False, stealing=stealing)
+                st.rerun()
+
 else:
     st.markdown(f"### {active['name']}, make your call")
     idx = active["progress"]
