@@ -82,7 +82,7 @@ def fresh_game(names):
     for name in names:
         players.append({"name": name, "row": new_row(), "progress": 1, "aces": 0, "free_flips": 0})
     return {"players": players, "current": 0, "pending": None, "winner": None,
-            "log": [f"{names[0]} starts the challenge."], "last_message": "Turn over your first card and make your opening call."}
+            "log": [f"{names[0]} starts the challenge."], "last_message": "Host: ask the player for Higher or Lower, then click their next face-down card.", "host_guess": None, "host_use_free_flip": False}
 
 def log(message):
     st.session_state.game["log"].insert(0, message)
@@ -92,6 +92,8 @@ def switch_turn(message):
     g = st.session_state.game
     g["current"] = 1 - g["current"]
     g["pending"] = None
+    g["host_guess"] = None
+    g["host_use_free_flip"] = False
     g["last_message"] = message
     p = g["players"][g["current"]]
     if p["progress"] == 0:
@@ -241,26 +243,38 @@ for i, col in enumerate(cols):
         active_label = '<div class="playing">● Playing now</div>' if i == current and not g["winner"] else '<div class="muted">Waiting</div>'
         st.markdown(f'<div class="panel {cls}"><div class="player-name">{p["name"]}</div>{active_label}<div style="display:flex;justify-content:space-between;margin-top:14px"><div><div class="stat">Cards cleared</div><div class="big-stat">{p["progress"]}/5</div></div><div><div class="stat">Aces</div><div class="big-stat">🂡 {p["aces"]}</div></div><div><div class="stat">Free flips</div><div class="big-stat">✨ {p["free_flips"]}</div></div></div></div>', unsafe_allow_html=True)
 
-# ---------- Card rows ----------
+# ---------- Card rows: host clicks to reveal ----------
 st.markdown("### The table")
+st.caption("The host controls the laptop. Ask the active player for their call, then click the next face-down card to reveal it.")
 for i, p in enumerate(players):
     st.markdown(f"**{p['name']}'s row**")
-    html = '<div class="cards">'
-    for j, card in enumerate(p["row"]):
+    card_cols = st.columns(5, gap="small")
+    for j, (card, card_col) in enumerate(zip(p["row"], card_cols)):
         revealed = j < p["progress"]
-        if i == current and g.get("pending") and g["pending"].get("player") == i and g["pending"]["type"] in ("wrong","trivia","pair"):
-            if j == p["progress"] and g["pending"]["type"] in ("wrong","trivia","pair"):
-                revealed = True
-        if revealed:
-            rank = card["rank"]
-            label = RANK_LABELS.get(rank, str(rank))
-            suit = card["suit"]
-            extra = "card-gold" if rank == 1 else ("card-red" if suit in RED_SUITS else "")
-            html += f'<div class="playing-card card-front {extra}"><span class="card-value">{label}</span><span class="card-suit">{suit}</span><span class="card-index">CARD {j+1}</span></div>'
-        else:
-            html += f'<div class="playing-card card-back"><span>✦</span><span class="card-index">CARD {j+1}</span></div>'
-    html += '</div>'
-    st.markdown(html, unsafe_allow_html=True)
+        if i == current and g.get("pending") and g["pending"].get("player") == i and g["pending"]["type"] in ("wrong", "trivia", "pair") and j == p["progress"]:
+            revealed = True
+        with card_col:
+            if revealed:
+                rank = card["rank"]
+                label = RANK_LABELS.get(rank, str(rank))
+                suit = card["suit"]
+                face = f"{label}{suit}"
+                extra = "card-gold" if rank == 1 else ("card-red" if suit in RED_SUITS else "")
+                st.markdown(f'<div class="playing-card card-front {extra}" style="width:100%;height:112px"><span class="card-value">{face}</span><span class="card-index">CARD {j+1}</span></div>', unsafe_allow_html=True)
+            else:
+                is_target = (i == current and j == p["progress"] and g.get("pending") is None and j < 5)
+                can_flip = is_target and (g.get("host_guess") in ("Higher", "Lower") or g.get("host_use_free_flip", False))
+                if st.button(f"🂠 CARD {j+1}", key=f"flip_{i}_{j}", disabled=not can_flip, use_container_width=True, type="primary" if can_flip else "secondary"):
+                    use_free = bool(g.get("host_use_free_flip"))
+                    chosen_guess = g.get("host_guess")
+                    if use_free and p["free_flips"] > 0:
+                        p["free_flips"] -= 1
+                    g["host_guess"] = None
+                    g["host_use_free_flip"] = False
+                    resolve_reveal(current, free=use_free, guess=chosen_guess)
+                    st.rerun()
+                if is_target and not can_flip:
+                    st.caption("Waiting for call")
 
 st.markdown(f'<div class="event"><b>TURN UPDATE</b><br>{g["last_message"]}</div>', unsafe_allow_html=True)
 
@@ -343,19 +357,26 @@ else:
         prev_label = RANK_LABELS.get(previous["rank"], str(previous["rank"]))
         st.markdown(f'<div class="panel" style="text-align:center"><div class="stat">Your current card</div><div style="font-size:3rem;font-weight:800;color:#f2d58b">{prev_label} {previous["suit"]}</div><div class="muted">Will the next card be higher or lower?</div></div>', unsafe_allow_html=True)
         if active["free_flips"] > 0:
-            if st.button(f"✨ Use Free Flip ({active['free_flips']}) — advance without guessing", type="primary", use_container_width=True):
-                active["free_flips"] -= 1
-                resolve_reveal(current, free=True)
+            if st.button(f"✨ Prepare Free Flip ({active['free_flips']}) — then click the card", type="secondary", use_container_width=True):
+                g["host_guess"] = None
+                g["host_use_free_flip"] = True
+                g["last_message"] = "Free Flip ready. Host: click the active player's next face-down card."
                 st.rerun()
         c1, c2 = st.columns(2)
         with c1:
-            if st.button("⬆️  HIGHER", type="primary", use_container_width=True):
-                resolve_reveal(current, guess="Higher")
+            if st.button("⬆️  PLAYER CALLS HIGHER", type="primary" if g.get("host_guess") == "Higher" else "secondary", use_container_width=True):
+                g["host_guess"] = "Higher"
+                g["host_use_free_flip"] = False
+                g["last_message"] = "Higher selected. Host: click the active player's next face-down card to reveal it."
                 st.rerun()
         with c2:
-            if st.button("⬇️  LOWER", type="primary", use_container_width=True):
-                resolve_reveal(current, guess="Lower")
+            if st.button("⬇️  PLAYER CALLS LOWER", type="primary" if g.get("host_guess") == "Lower" else "secondary", use_container_width=True):
+                g["host_guess"] = "Lower"
+                g["host_use_free_flip"] = False
+                g["last_message"] = "Lower selected. Host: click the active player's next face-down card to reveal it."
                 st.rerun()
+        if g.get("host_guess"):
+            st.info(f"Call recorded: **{g['host_guess']}**. Now click the next face-down card in {active['name']}'s row.")
 
 # ---------- Activity & controls ----------
 with st.expander("📜 Game history", expanded=False):
